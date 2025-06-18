@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mediain Chatbot</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        #chat-container {
+            position: relative;
+            margin: 40px auto;
+            max-width: 400px;
+            display: block;
+            z-index: 1002;
+        }
+        .system-msg {
+            text-align: center;
+            margin: 10px 0;
+            background: #fffbe6;
+            color: #b38f00;
+            padding: 8px;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+        .user-label {
+            font-size: 11px;
+            color: #4a90e2;
+            text-align: right;
+            margin-right: 8px;
+        }
+        .bot-label {
+            font-size: 11px;
+            color: #888;
+            text-align: left;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="chat-header">🧠 Mediain Asistan</div>
+        <div id="chat-box">
+            <div class="system-msg">⚠️ Bu chatbot tıbbi tavsiye vermez, sadece bilgilendirme amaçlıdır.</div>
+        </div>
+        <div id="chat-input-area">
+            <input type="text" id="user-input" placeholder="Bir şey yazın..." />
+            <button onclick="sendMessage()">Gönder</button>
+        </div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById("user-input");
+            const message = input.value.trim();
+            if (!message) return;
+
+            const chatBox = document.getElementById("chat-box");
+            // Kullanıcı mesajı
+            chatBox.innerHTML += `<div class="user-label">user</div><div class="user-msg">${message}</div>`;
+            input.value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Backend'e POST isteği
+            const response = await fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message })
+            });
+
+            const data = await response.json();
+            // Bot mesajı
+            chatBox.innerHTML += `<div class="bot-label">bot</div><div class="bot-msg">${data.response}</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
